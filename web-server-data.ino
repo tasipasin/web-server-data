@@ -1,4 +1,5 @@
 #include "DTWebServer.h"
+#include <Arduino_JSON.h>
 
 // Replace with your network credentials
 const char *ssid = "DuTea-AP";
@@ -9,22 +10,24 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
 bool stats = false;
 
+const char *readings;
+
 /** Objeto do Webserver. */
 DTWebServer *webServer;
 
 // Get Sensor Readings and return JSON object
-String getSensorReadings() {
-  readings["timestamp"] = String(millis());
-  readings["relay_state"] = String(stats);
-  String jsonString = JSON.stringify(readings);
-  return jsonString;
+void updateSensorReadings() {
+  JSONVar readingsJson;
+  readingsJson["timestamp"] = String(millis());
+  readingsJson["relay_state"] = String(stats);
+  readings = JSON.stringify(readingsJson).c_str();
 }
 
 void setup() {
-  webServer = DTWebServer(ssid, password);
+  webServer = new DTWebServer(ssid, password);
   // Serial port for debugging purposes
   Serial.begin(115200);
-  webServer.init();
+  webServer->init(readings);
 }
 
 void loop() {
@@ -32,7 +35,8 @@ void loop() {
     stats = !stats;
     lastTime = millis();
     // Send Events to the client with the Sensor Readings Every 10 seconds
-    webServer.send("ping", NULL, millis());
-    webServer.send(getSensorReadings().c_str(), "new_readings", millis());
+    webServer->sendData("ping", NULL, millis());
+    updateSensorReadings();
+    webServer->sendData(readings, "new_readings", millis());
   }
 }

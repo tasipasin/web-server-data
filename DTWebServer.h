@@ -6,24 +6,22 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "SPIFFS.h"
-#include <Arduino_JSON.h>
 
 class DTWebServer
 {
 public:
-    DTWebServer();
-    void init();
-    void send(char *data, char *command, long millis);
+    DTWebServer(const char *ssid, const char *password);
+    void init(const char *info);
+    void sendData(const char *dataToSend, const char *command, long timestamp);
 
 private:
-    AsyncWebServer server;
-    AsyncEventSource events;
-    JSONVar readings;
-    char *ssid;
-    char *psw;
+    AsyncWebServer *server;
+    AsyncEventSource *events;
+    const char *ssid;
+    const char *psw;
 
     void initWiFi();
     void initSPIFFS();
-}
+};
 
 #endif

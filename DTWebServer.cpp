@@ -8,11 +8,13 @@ DTWebServer::DTWebServer(const char *ssid, const char *password)
 
 void DTWebServer::init(const char *info)
 {
+  this->lastData = info;
+  // Determina a porta do servidor
   server = new AsyncWebServer(80);
   events = new AsyncEventSource("/events");
   this->initWiFi();
   this->initSPIFFS();
-  // Web Server Root URL
+  // Determina a página raíz da aplicação
   this->server->on("/", HTTP_GET, [](AsyncWebServerRequest * request)
   {
     request->send(SPIFFS, "/index.html", "text/html");
@@ -20,23 +22,24 @@ void DTWebServer::init(const char *info)
 
   this->server->serveStatic("/", SPIFFS, "/");
 
-  // Request for the latest sensor readings
-  this->server->on("/readings", HTTP_GET, [&info](AsyncWebServerRequest * request)
+  // Cliente requer os últimos dados ao se conectar
+  this->server->on("/readings", HTTP_GET, [this](AsyncWebServerRequest * request)
   {
-    request->send(200, "application/json", info);
+    request->send(200, "application/json", lastData);
   });
   this->server->addHandler(events);
-  // Start server
   this->server->begin();
 }
 
 void DTWebServer::sendData(const char *dataToSend, const char *command, long timestamp)
 {
+  this->lastData = dataToSend;
   this->events->send(dataToSend, command, timestamp);
 }
 
 void DTWebServer::initWiFi()
 {
+  // Inicializa o WIFI como Access Point
   WiFi.mode(WIFI_AP);
   WiFi.softAP(this->ssid, this->psw);
   Serial.println(WiFi.softAPIP());

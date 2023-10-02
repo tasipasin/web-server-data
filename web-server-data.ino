@@ -10,26 +10,28 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
 bool stats = false;
 
-const char *readings;
-
 /** Objeto do Webserver. */
 DTWebServer *webServer;
 
 /**
  * Atualiza o objeto de leituras para enviar por requisição.
  */
-void updateSensorReadings() {
+String updateSensorReadings() {
   JSONVar readingsJson;
   readingsJson["timestamp"] = String(millis());
   readingsJson["relay_state"] = String(stats);
-  readings = JSON.stringify(readingsJson).c_str();
+  return JSON.stringify(readingsJson);
 }
 
 void setup() {
   webServer = new DTWebServer(ssid, password);
+  // Cliente requer os últimos dados ao se conectar
+  webServer->getWebServer()->on("/readings", HTTP_GET, [](AsyncWebServerRequest * request)
+  {
+    request->send(200, "application/json", updateSensorReadings());
+  });
   Serial.begin(115200);
-  updateSensorReadings();
-  webServer->init(readings);
+  webServer->init();
 }
 
 void loop() {
@@ -38,7 +40,6 @@ void loop() {
     lastTime = millis();
     // Envia ping e os novos dados
     webServer->sendData("ping", NULL, millis());
-    updateSensorReadings();
-    webServer->sendData(readings, "new_readings", millis());
+    webServer->sendData(updateSensorReadings().c_str(), "new_readings", millis());
   }
 }

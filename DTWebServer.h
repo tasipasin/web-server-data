@@ -24,7 +24,7 @@ public:
      * Iniciador do Web Server.
      * @param info Referência para os dados que devem ser enviados ao conectar o servidor.
      */
-    void init(const char *info);
+    void init();
 
     /**
      * Envia os dados para o Web Server.
@@ -33,6 +33,12 @@ public:
      * @param timestamp Timestamp do envio da mensagem.
      */
     void sendData(const char *dataToSend, const char *command, long timestamp);
+
+    /**
+     * Retorna o WebServer.
+     * @return o WebServer.
+     */
+    AsyncWebServer* getWebServer();
 
 private:
     /** Servidor WEB. */
@@ -43,8 +49,6 @@ private:
     const char *ssid;
     /** Senha da Rede. */
     const char *psw;
-    /** Último conjunto de dados enviado. */
-    const char *lastData;
 
     /**
      * Inicializa AP.

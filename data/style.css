@@ -5,3 +5,8 @@ table, th, td {
  td, th {
     padding: 10px;
  }
+
+ div{
+   padding-left: 20px;
+   padding-bottom: 30px
+ }

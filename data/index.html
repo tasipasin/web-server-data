@@ -9,12 +9,22 @@
     <div class="topnav">
       <h1>DuTea</h1>
     </div>
+    <div>
+      <form onsubmit="onSubmit();return false;" action="" method="post">
+          <!-- Campo de Temperatura -->
+          <label for="entryTemp" class="input-label">Inicia digitando 1:</label>
+          <input id="entryTemp" name="entryTemp" type="number"><br><br>
+          <input type="submit" value="Iniciar Processo">
+      </form>
+  </div>
     <div class="content">
         <table id="dataTable">
             <caption>Tabela de Dados do processo do DuTea</caption>
             <thead>
                 <th>Timestamp</th>
+                <th>Data/Hora</th>
                 <th>Estado</th>
+                <th>Mensagem Completa</th>
              </thead>
         </table>
     </div>

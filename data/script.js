@@ -7,7 +7,6 @@ window.addEventListener('load', function (e) {
       addRowFromData(this.responseText);
     }
   };
-
   xhr.open("GET", "/readings", true);
   xhr.send();
 }, false);
@@ -40,16 +39,39 @@ if (window.EventSource) {
  * @param data Dados recebidos no formato JSON.
  */
 function addRowFromData(data) {
+  let myObj = JSON.parse(data);
+  let table = document.getElementById("dataTable");
+  // Insere linha na tabela
+  let row = table.insertRow(1);
   try {
-    let myObj = JSON.parse(data);
-    let table = document.getElementById("dataTable");
-    // Insere linha na tabela
-    let row = table.insertRow(1);
     // Preenche com os dados
     row.insertCell(0).innerHTML = myObj.timestamp;
-    row.insertCell(1).innerHTML = myObj.relay_state;
+    row.insertCell(1).innerHTML = (new Date()).toLocaleString();
+    row.insertCell(2).innerHTML = myObj.relay_state;
   } catch (e) {
     console.log("error: " + e);
     console.log("message: " + data);
   }
+  row.insertCell(3).innerHTML = data;
+}
+
+function onSubmit(event) {
+  let xhr = new XMLHttpRequest();
+  xhr.open("POST", "/get-message", true);
+  xhr.setRequestHeader("Accept", "application/json");
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      console.log(xhr.responseText);
+    }
+  };
+
+  let data = {"start": parseInt(document.getElementById("entryTemp").value)};
+  console.log("dados enviados: " + JSON.stringify(data));
+
+  xhr.send(JSON.stringify(data));
+  console.log(xhr);
+  return false;
 }
